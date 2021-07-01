@@ -32,9 +32,9 @@ const List<String> cryptoList = [
 
 class CoinData {
 
-  Future<dynamic> getCurrencyData() async
+  Future<dynamic> getCurrencyData({String crypto, String currency}) async
   {
-    NetworkHelper networkHelper = NetworkHelper('https://rest.coinapi.io/v1/exchangerate/BTC/USD?apikey=FC86B31F-7FAD-4AE5-94F6-BD66EF4744E1');
+    NetworkHelper networkHelper = NetworkHelper('https://rest.coinapi.io/v1/exchangerate/$crypto/$currency?apikey=FC86B31F-7FAD-4AE5-94F6-BD66EF4744E1');
     var theData = await networkHelper.getData();
 
     return theData;

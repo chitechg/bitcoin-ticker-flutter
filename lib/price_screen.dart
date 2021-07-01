@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'coin_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
-import 'networking.dart';
 
 class PriceScreen extends StatefulWidget {
 
@@ -21,9 +20,9 @@ class _PriceScreenState extends State<PriceScreen> {
   var theData;
 
   String selectedCurrency = 'USD';
-  String cryptoType;
-  String currencyType;
-  int rate;
+  String rateBTC;
+  String rateETH;
+  String rateLTC;
 
   DropdownButton<String> androidDropdown(){
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -42,6 +41,7 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value){
         setState(() {
         selectedCurrency = value;
+        updateUI();
       });
       },
     );
@@ -60,7 +60,8 @@ class _PriceScreenState extends State<PriceScreen> {
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex){
-
+        selectedCurrency = currenciesList[selectedIndex];
+        updateUI();
       },
       children: pickerItems,
     );
@@ -74,7 +75,18 @@ class _PriceScreenState extends State<PriceScreen> {
   }
   void updateUI() async
   {
-    theData = await coinData.getCurrencyData();
+    //set these as temp while waiting for actual values
+    rateBTC = '?';
+    rateETH = '?';
+    rateLTC = '?';
+
+    theData = await coinData.getCurrencyData(crypto: 'BTC', currency: selectedCurrency,);
+    rateBTC = theData['rate'].toInt().toString(); //drop decimal and make string for easier manipulation
+    theData = await coinData.getCurrencyData(crypto: 'ETH', currency: selectedCurrency,);
+    rateETH = theData['rate'].toInt().toString();
+    theData = await coinData.getCurrencyData(crypto: 'LTC', currency: selectedCurrency,);
+    rateLTC = theData['rate'].toInt().toString();
+
     setState(() {
 
       if(coinData == null)
@@ -82,12 +94,6 @@ class _PriceScreenState extends State<PriceScreen> {
         print("COIN SCREEN: something fucked up");
         return;
       }
-      cryptoType = theData['asset_id_base'];
-      print(cryptoType);
-      currencyType = theData['asset_id_quote'];
-      print(currencyType);
-      rate = theData['rate'].toInt();
-      print(rate);
     });
 
   }
@@ -113,7 +119,49 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 $cryptoType = $rate $currencyType',
+                  '1 BTC = $rateBTC $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 0.0, 18.0, 0),
+            child: Card(
+              color: Colors.lightBlueAccent,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  '1 ETH = $rateETH $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 0.0, 18.0, 0),
+            child: Card(
+              color: Colors.lightBlueAccent,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  '1 LTC = $rateLTC $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
